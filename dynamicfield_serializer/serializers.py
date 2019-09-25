@@ -23,20 +23,19 @@ class DynamicFieldSerializer(Serializer):
             if not isinstance(self.initial_data, Mapping):
                 return OrderedDict()
 
-
             return_list = list()
             fields = self.response_fields
             for fname in fields:
                 for field_name, field in self.fields.items():
                     if (field.get_value(self.initial_data) is not empty) \
-                        and not field.read_only \
-                        and field.field_name == fname:
+                            and not field.read_only \
+                            and field.field_name == fname:
                         return_list.append((field_name, field.get_value(self.initial_data)))
             return OrderedDict(return_list) if return_list else OrderedDict([
                 (field_name, field.get_value(self.initial_data))
                 for field_name, field in self.fields.items()
                 if (field.get_value(self.initial_data) is not empty) and
-                not field.read_only
+                   not field.read_only
             ])
         else:
             return_list = list()
@@ -55,9 +54,10 @@ class DynamicFieldSerializer(Serializer):
         Object instance -> Dict of primitive datatypes.
         """
         ret = OrderedDict()
-        read_fields = {field.field_name: field for field in self._readable_fields if field.field_name in self.response_fields}
+        read_fields = {field.field_name: field for field in self._readable_fields if
+                       field.field_name in self.response_fields}
         fields = (read_fields[field] for field in self.response_fields if read_fields.get(field))
-        
+
         for field in fields:
             if field.field_name in self.response_fields:
                 try:
@@ -73,9 +73,8 @@ class DynamicFieldSerializer(Serializer):
                 check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
                 if check_for_none is None:
                     ret[field.field_name] = None
-                else:		
+                else:
                     ret[field.field_name] = field.to_representation(attribute)
-        
         return ret
 
     @classmethod

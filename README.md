@@ -1,4 +1,4 @@
-# DynamicFieldSerializer fro DRF
+# DynamicFieldSerializer for DRF
 
 
 ## Requirements
