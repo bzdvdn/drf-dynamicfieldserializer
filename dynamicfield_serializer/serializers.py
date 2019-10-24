@@ -23,26 +23,25 @@ class DynamicFieldSerializer(Serializer):
             if not isinstance(self.initial_data, Mapping):
                 return OrderedDict()
 
-            return_list = list()
+            return_list = []
             fields = self.response_fields
-            for fname in fields:
-                for field_name, field in self.fields.items():
+            for return_field in fields:
+                field = self.fields.get(return_field)
+                if field:
                     if (field.get_value(self.initial_data) is not empty) \
-                            and not field.read_only \
-                            and field.field_name == fname:
-                        return_list.append((field_name, field.get_value(self.initial_data)))
+                            and not field.read_only:
+                        return_list.append((return_field, field.get_value(self.initial_data)))
             return OrderedDict(return_list) if return_list else OrderedDict([
                 (field_name, field.get_value(self.initial_data))
                 for field_name, field in self.fields.items()
-                if (field.get_value(self.initial_data) is not empty) and
-                   not field.read_only
+                if (field.get_value(self.initial_data) is not empty) and not field.read_only
             ])
         else:
-            return_list = list()
-            for fname in self.response_fields:
-                for field in self.fields.values():
-                    if not field.read_only and field.field_name == fname:
-                        return_list.append((field.field_name, field.get_initial()))
+            return_list = []
+            for return_field in self.response_fields:
+                field = self.fields.get(return_field)
+                if field and not field.read_only:
+                    return_list.append((field.field_name, field.get_initial()))
             return OrderedDict(return_list) if return_list else OrderedDict([
                 (field.field_name, field.get_initial())
                 for field in self.fields.values()
@@ -54,8 +53,7 @@ class DynamicFieldSerializer(Serializer):
         Object instance -> Dict of primitive datatypes.
         """
         ret = OrderedDict()
-        read_fields = {field.field_name: field for field in self._readable_fields if
-                       field.field_name in self.response_fields}
+        read_fields = {field.field_name: field for field in self._readable_fields}
         fields = (read_fields[field] for field in self.response_fields if read_fields.get(field))
 
         for field in fields:
