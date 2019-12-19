@@ -10,7 +10,7 @@ class DynamicFieldSerializer(Serializer):
         super(DynamicFieldSerializer, self).__init__(*args, **kwargs)
         self.response_fields = fields or self.context.get("response_fields", [])
         if self.response_fields:
-            allowed = set(fields)
+            allowed = set(self.response_fields)
             existing = set(self.fields.keys())
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
